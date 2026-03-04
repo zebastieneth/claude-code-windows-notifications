@@ -8,10 +8,9 @@ Never miss a prompt or task completion again — get notified with sound, toast,
 
 - **Toast notifications** with custom icon and sound
 - **Smart titles** with emoji per notification type:
-  - ⚡ Permission Required
+  - ✴️ Input Needed (permissions + questions)
   - ✅ Task Complete
   - 🔑 Authentication Successful
-  - ✴️ Input Needed
 - **Project name in title** — know which tab needs attention when running multiple sessions
 - **Click to focus** — click the toast to bring Windows Terminal to the foreground
 - **Taskbar flash** — orange flash on the taskbar icon

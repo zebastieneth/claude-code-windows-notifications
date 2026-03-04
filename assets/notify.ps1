@@ -37,7 +37,7 @@ $now | Set-Content $cooldownFile -Force
 
 # Customize title based on notification type
 switch ($NotificationType) {
-    "permission_prompt"  { $Title = "$([char]0x26A1) Permission Required" }
+    "permission_prompt"  { $Title = "$([char]0x2734)$([char]0xFE0F) Input Needed" }
     "idle_prompt"        { $Title = "$([char]0x2705) Task Complete" }
     "auth_success"       { $Title = "$([char]0xD83D)$([char]0xDD11) Authentication Successful" }
     "elicitation_dialog" { $Title = "$([char]0x2734)$([char]0xFE0F) Input Needed" }
