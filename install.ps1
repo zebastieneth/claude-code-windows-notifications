@@ -17,6 +17,7 @@ Write-Host "[1/4] Copying files to $ClaudeDir..." -ForegroundColor Yellow
 if (!(Test-Path $ClaudeDir)) { New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null }
 
 Copy-Item (Join-Path $AssetsDir "notify.ps1") $ClaudeDir -Force
+Copy-Item (Join-Path $AssetsDir "notify-complete.ps1") $ClaudeDir -Force
 Copy-Item (Join-Path $AssetsDir "focus-terminal.ps1") $ClaudeDir -Force
 Copy-Item (Join-Path $AssetsDir "notification-icon.png") $ClaudeDir -Force
 Copy-Item (Join-Path $AssetsDir "notification-sound.mp3") $ClaudeDir -Force
@@ -45,14 +46,24 @@ Write-Host "[3/4] Configuring Claude Code hooks..." -ForegroundColor Yellow
 
 $settingsPath = Join-Path $ClaudeDir "settings.json"
 $notifyScript = Join-Path $ClaudeDir "notify.ps1"
-$hookCommand = "powershell -ExecutionPolicy Bypass -Command `"& $notifyScript`""
+$notifyCompleteScript = Join-Path $ClaudeDir "notify-complete.ps1"
 
-$hook = @{
+$notificationHook = @{
     matcher = ""
     hooks = @(
         @{
             type = "command"
-            command = $hookCommand
+            command = "powershell -ExecutionPolicy Bypass -Command `"& $notifyScript`""
+        }
+    )
+}
+
+$stopHook = @{
+    matcher = ""
+    hooks = @(
+        @{
+            type = "command"
+            command = "powershell -ExecutionPolicy Bypass -Command `"& $notifyCompleteScript`""
         }
     )
 }
@@ -68,8 +79,9 @@ if (-not $settings.PSObject.Properties['hooks']) {
     $settings | Add-Member -NotePropertyName 'hooks' -NotePropertyValue ([PSCustomObject]@{})
 }
 
-# Set Notification hook
-$settings.hooks | Add-Member -NotePropertyName 'Notification' -NotePropertyValue @($hook) -Force
+# Set hooks
+$settings.hooks | Add-Member -NotePropertyName 'Notification' -NotePropertyValue @($notificationHook) -Force
+$settings.hooks | Add-Member -NotePropertyName 'Stop' -NotePropertyValue @($stopHook) -Force
 
 $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Force
 
@@ -87,9 +99,12 @@ Write-Host ""
 Write-Host "  Installation complete!" -ForegroundColor Green
 Write-Host "  You should see a test notification now." -ForegroundColor Green
 Write-Host ""
+Write-Host "  Notifications:" -ForegroundColor Cyan
+Write-Host "    - $([char]0x2734)$([char]0xFE0F) Input Needed — when Claude needs a permission or asks a question"
+Write-Host "    - $([char]0x2733)$([char]0xFE0F) Task Complete — when Claude finishes working"
+Write-Host ""
 Write-Host "  Features:" -ForegroundColor Cyan
 Write-Host "    - Toast notifications with custom sound"
-Write-Host "    - Emoji titles per notification type"
 Write-Host "    - Project folder name in title"
 Write-Host "    - Click toast to focus terminal"
 Write-Host "    - Taskbar icon flash"

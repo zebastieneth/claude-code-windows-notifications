@@ -8,7 +8,7 @@ Write-Host "  Uninstalling Claude Code Windows Notifications..." -ForegroundColo
 Write-Host ""
 
 # Remove files
-$files = @("notify.ps1", "focus-terminal.ps1", "focus-terminal.vbs", "notification-icon.png", "notification-sound.mp3")
+$files = @("notify.ps1", "notify-complete.ps1", "focus-terminal.ps1", "focus-terminal.vbs", "notification-icon.png", "notification-sound.mp3")
 foreach ($file in $files) {
     $path = Join-Path $ClaudeDir $file
     if (Test-Path $path) { Remove-Item $path -Force; Write-Host "  Removed $file" }
@@ -20,14 +20,24 @@ if (Test-Path 'HKCU:\Software\Classes\claude-focus') {
     Write-Host "  Removed claude-focus: protocol"
 }
 
-# Remove hook from settings
+# Remove hooks from settings
 $settingsPath = Join-Path $ClaudeDir "settings.json"
 if (Test-Path $settingsPath) {
     $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
-    if ($settings.PSObject.Properties['hooks'] -and $settings.hooks.PSObject.Properties['Notification']) {
-        $settings.hooks.PSObject.Properties.Remove('Notification')
+    $changed = $false
+    if ($settings.PSObject.Properties['hooks']) {
+        if ($settings.hooks.PSObject.Properties['Notification']) {
+            $settings.hooks.PSObject.Properties.Remove('Notification')
+            $changed = $true
+        }
+        if ($settings.hooks.PSObject.Properties['Stop']) {
+            $settings.hooks.PSObject.Properties.Remove('Stop')
+            $changed = $true
+        }
+    }
+    if ($changed) {
         $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Force
-        Write-Host "  Removed Notification hook from settings"
+        Write-Host "  Removed hooks from settings"
     }
 }
 

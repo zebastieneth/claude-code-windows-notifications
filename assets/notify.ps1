@@ -1,11 +1,5 @@
 # Claude Code notification script
-# Plays sound + shows Windows toast notification with smart features:
-# - Different titles/emojis per notification type
-# - Project folder name in title (helps with multiple tabs)
-# - 3-second cooldown to prevent spam
-# - Suppresses when terminal is already focused
-# - Flashes taskbar icon
-# - Click toast to focus terminal
+# Plays sound + shows Windows toast notification
 
 param(
     [string]$Title = "Claude Code",
@@ -14,14 +8,18 @@ param(
 
 $ClaudeDir = Join-Path $env:USERPROFILE ".claude"
 
-# Read message from stdin (hook input) if available
+# Read notification type from env var (set by wrapper scripts) or stdin (hook input)
 $NotificationType = ""
-try {
-    $input_data = [Console]::In.ReadToEnd() | ConvertFrom-Json
-    if ($input_data.title) { $Title = $input_data.title }
-    if ($input_data.message) { $Message = $input_data.message }
-    if ($input_data.notification_type) { $NotificationType = $input_data.notification_type }
-} catch {}
+if ($env:CLAUDE_NOTIFY_TYPE) {
+    $NotificationType = $env:CLAUDE_NOTIFY_TYPE
+} else {
+    try {
+        $input_data = [Console]::In.ReadToEnd() | ConvertFrom-Json
+        if ($input_data.title) { $Title = $input_data.title }
+        if ($input_data.message) { $Message = $input_data.message }
+        if ($input_data.notification_type) { $NotificationType = $input_data.notification_type }
+    } catch {}
+}
 
 # Get project folder name from current working directory
 $projectName = Split-Path (Get-Location).Path -Leaf
@@ -38,7 +36,7 @@ $now | Set-Content $cooldownFile -Force
 # Customize title based on notification type
 switch ($NotificationType) {
     "permission_prompt"  { $Title = "$([char]0x2734)$([char]0xFE0F) Input Needed" }
-    "idle_prompt"        { $Title = "$([char]0x2705) Task Complete" }
+    "idle_prompt"        { $Title = "$([char]0x2733)$([char]0xFE0F) Task Complete" }
     "auth_success"       { $Title = "$([char]0xD83D)$([char]0xDD11) Authentication Successful" }
     "elicitation_dialog" { $Title = "$([char]0x2734)$([char]0xFE0F) Input Needed" }
 }

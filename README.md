@@ -7,10 +7,9 @@ Never miss a prompt or task completion again — get notified with sound, toast,
 ## Features
 
 - **Toast notifications** with custom icon and sound
-- **Smart titles** with emoji per notification type:
-  - ✴️ Input Needed (permissions + questions)
-  - ✅ Task Complete
-  - 🔑 Authentication Successful
+- **Two notification types:**
+  - ✴️ Input Needed — when Claude needs a permission or asks a question
+  - ✳️ Task Complete — when Claude finishes working
 - **Project name in title** — know which tab needs attention when running multiple sessions
 - **Click to focus** — click the toast to bring Windows Terminal to the foreground
 - **Taskbar flash** — orange flash on the taskbar icon
@@ -28,7 +27,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 That's it! The installer:
 1. Copies notification scripts and assets to `~/.claude/`
 2. Registers a `claude-focus:` protocol for click-to-focus
-3. Adds the Notification hook to your Claude Code settings
+3. Adds the `Notification` and `Stop` hooks to your Claude Code settings
 
 ## Uninstall
 
@@ -52,4 +51,9 @@ Replace `assets/notification-icon.png` with your own image and re-run `install.p
 
 ## How it works
 
-Claude Code supports [hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) — shell commands that run in response to events. This project uses the `Notification` hook to trigger a PowerShell script that shows a Windows toast notification with sound.
+Claude Code supports [hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) — shell commands that run in response to events. This project uses two hooks:
+
+- **`Notification`** hook — fires when Claude needs input (permissions, questions). Shows ✴️ Input Needed.
+- **`Stop`** hook — fires when Claude finishes responding. Shows ✳️ Task Complete.
+
+Both are suppressed when Windows Terminal is already the foreground window.
