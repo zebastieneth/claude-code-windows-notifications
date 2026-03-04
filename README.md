@@ -21,7 +21,7 @@ Never miss a prompt or task completion again — get notified with sound, toast,
 ## Install
 
 ```powershell
-git clone https://github.com/YOUR_USERNAME/claude-code-windows-notifications
+git clone https://github.com/zebastieneth/claude-code-windows-notifications
 cd claude-code-windows-notifications
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
