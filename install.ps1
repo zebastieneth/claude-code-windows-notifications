@@ -45,7 +45,7 @@ Write-Host "[3/4] Configuring Claude Code hooks..." -ForegroundColor Yellow
 
 $settingsPath = Join-Path $ClaudeDir "settings.json"
 $notifyScript = Join-Path $ClaudeDir "notify.ps1"
-$hookCommand = "powershell -ExecutionPolicy Bypass -File $($notifyScript -replace '\\','\\')"
+$hookCommand = "powershell -ExecutionPolicy Bypass -Command `"& $notifyScript`""
 
 $hook = @{
     matcher = ""
@@ -79,7 +79,7 @@ Write-Host "  Done." -ForegroundColor Green
 Write-Host "[4/4] Sending test notification..." -ForegroundColor Yellow
 
 $testInput = '{"notification_type":"idle_prompt","message":"Installation successful!"}'
-$testInput | powershell -ExecutionPolicy Bypass -File $notifyScript
+$testInput | powershell -ExecutionPolicy Bypass -Command "& '$notifyScript'"
 
 Write-Host "  Done." -ForegroundColor Green
 
